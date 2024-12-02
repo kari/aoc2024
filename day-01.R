@@ -1,5 +1,4 @@
 library(readr)
-library(purrr)
 library(dplyr)
 library(tibble)
 
@@ -10,11 +9,11 @@ sum(abs(sort(input$X1) - sort(input$X2)))
 
 # part 2
 
-x2_tbl <- input$X2 |>
-  as_tibble() |>
-  count(value) |>
-  mutate(score = n * value)
+lookup <- input |>
+  count(X2) |>
+  mutate(score = X2 * n)
 
-input$X1 |>
-  map_int(\(x) x2_tbl$score[match(x, x2_tbl$value)]) |>
-  sum(na.rm = TRUE)
+input |>
+  select(X1) |>
+  inner_join(lookup, by = join_by(X1 == X2)) |>
+  summarise(sum = sum(score, na.rm = TRUE))
