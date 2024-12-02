@@ -3,7 +3,9 @@ library(meltr)
 library(purrr)
 library(dplyr)
 
-input <- melt_delim("02-input.txt", delim = " ")
+input <- melt_delim("02-input.txt", delim = " ") |>
+  mutate(value = as.integer(value)) |>
+  unstack(value ~ row)
 
 # part 1
 safety <- function(vec) {
@@ -13,8 +15,6 @@ safety <- function(vec) {
 }
 
 input |>
-  mutate(value = as.integer(value)) |>
-  unstack(value ~ row) |>
   map_lgl(safety) |>
   sum(na.rm = TRUE)
 
@@ -35,7 +35,5 @@ dampener <- function(vec) {
 }
 
 input |>
-  mutate(value = as.integer(value)) |>
-  unstack(value ~ row) |>
   map_lgl(dampener) |>
   sum(na.rm = TRUE)
