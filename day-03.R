@@ -1,27 +1,29 @@
 library(readr)
-library(purrr)
 library(stringr)
+library(purrr)
+library(dplyr)
+library(tibble)
 
 input <- read_file("03-input.txt")
 
 # day 1
 input |>
   str_match_all("mul\\((?<x>\\d+),(?<y>\\d+)\\)") |>
-  pluck(1) |> 
-  as_tibble() |>
-  mutate(z = as.numeric(x) * as.numeric(y), .keep = "none") |> 
+  pluck(1) |>
+  as_tibble(.name_repair = "unique") |>
+  mutate(z = as.numeric(x) * as.numeric(y), .keep = "none") |>
   sum()
-  
+
 # day 2
 mul_filter <- function(m) {
-  do = TRUE
+  do <- TRUE
   t <- tibble(x = numeric(), y = numeric())
-  for (i in 1:nrow(m)) {
+  for (i in seq_len(nrow(m))) {
     if (m[i, 1] == "don't()") {
-      do = FALSE
+      do <- FALSE
       next
     } else if (m[i, 1] == "do()") {
-      do = TRUE
+      do <- TRUE
       next
     }
     if (!do) {
@@ -29,14 +31,13 @@ mul_filter <- function(m) {
     }
     t <- add_row(t, x = as.numeric(m[i, 2]), y = as.numeric(m[i, 3]))
   }
-  
+
   return(t)
 }
 
 input |>
-  str_match_all("mul\\((?<x>\\d+),(?<y>\\d+)\\)|don't\\(\\)|do\\(\\)") |>
+  str_match_all("mul\\((?<x>\\d+),(?<y>\\d+)\\)|do(n't)?\\(\\)") |>
   pluck(1) |>
   mul_filter() |>
-  mutate(z = as.numeric(x) * as.numeric(y), .keep = "none") |> 
+  mutate(z = as.numeric(x) * as.numeric(y), .keep = "none") |>
   sum()
-

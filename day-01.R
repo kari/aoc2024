@@ -1,6 +1,5 @@
 library(readr)
 library(dplyr)
-library(tibble)
 
 input <- read_table("01-input.txt", col_names = FALSE)
 
