@@ -18,6 +18,7 @@ updates <- input[(match("", input) + 1):length(input)] |>
 
 # part 1
 mids <- 0
+fail <- list()
 for (u in updates) {
   u_rules <- rules |> filter(before %in% u & after %in% u)
   correct <- TRUE
@@ -42,6 +43,26 @@ for (u in updates) {
   }
   if (correct) {
     mids <- mids + u[(1 + length(u)) / 2]
+  } else {
+    fail <- append(fail, list(u))
   }
+}
+print(mids)
+
+# part 2
+mids <- 0
+for (u in fail) {
+  order <- numeric(0)
+  u_rules <- rules |> filter(before %in% u & after %in% u)
+  while (nrow(u_rules) > 0) {
+    nopreds <- u_rules |>
+      filter(!(before %in% after)) |>
+      pull(before) |>
+      unique()
+    u_rules <- u_rules |> filter(!(before %in% nopreds))
+    order <- append(order, nopreds)
+  }
+  order <- append(order, u[!(u %in% order)])
+  mids <- mids + order[(1 + length(order)) / 2]
 }
 print(mids)
