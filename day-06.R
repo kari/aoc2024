@@ -1,7 +1,7 @@
 library(readr)
 library(purrr)
 
-input <- read_lines("06-sample.txt") |>
+input <- read_lines("06-input.txt") |>
   str_split_fixed("", n = Inf)
 
 path <- matrix(nrow = nrow(input), ncol = ncol(input))
@@ -27,8 +27,7 @@ print(sum(path, na.rm = TRUE))
 
 # part 2
 loops <- 0
-for (i in seq_along(input)) {
-  # print(paste(i, "/", length(input)))
+for (i in which(path == 1)) {
   map <- input
   map[i] <- "O"
   path <- vector(mode = "list", length = length(map))
@@ -42,7 +41,7 @@ for (i in seq_along(input)) {
     if (is.null(path[[idx]])) {
       path[[idx]] <- angle
     } else if (angle %in% path[[idx]]) {
-      print("infinite loop")
+      # print("infinite loop")
       # print(map2_vec(map, path, \(x,y) if (is.na(y)) { x } else { y } ) |> matrix(ncol=ncol(input), nrow=nrow(input)))
       loops <- loops + 1
       break
