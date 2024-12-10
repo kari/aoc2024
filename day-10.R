@@ -10,11 +10,13 @@ input <- input |>
   matrix(ncol = ncol(input), nrow(input))
 
 trailheads <- which(input == 0, arr.ind = TRUE)
-# trailheads <- trailheads[1:2, ]
-acc <- 0
+scores <- 0
+ratings <- 0
+
 for (t in seq_len(nrow(trailheads))) {
   # print(paste("at trailhead", trailheads[t, 1], trailheads[t, 2]))
   cursors <- list(trailheads[t, ])
+
   while (!every(cursors, \(x) input[x[1], x[2]] == 9) && length(cursors) > 0) {
     new_cursors <- list()
 
@@ -43,7 +45,9 @@ for (t in seq_len(nrow(trailheads))) {
     }
     cursors <- new_cursors
   }
-  # print(cursors)
-  acc <- acc + length(unique(cursors))
+  scores <- scores + length(unique(cursors))
+  ratings <- ratings + length(cursors)
 }
-print(acc)
+
+print(scores)
+print(ratings)
