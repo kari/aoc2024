@@ -5,7 +5,7 @@ library(arrangements)
 input <- read_lines("08-input.txt") |>
   str_split_fixed("", n = Inf)
 
-antennas <-  c(LETTERS, letters, 0:9)[c(LETTERS, letters, 0:9) %in% input]
+antennas <- c(LETTERS, letters, 0:9)[c(LETTERS, letters, 0:9) %in% input]
 
 # part 1
 antinodes <- matrix(nrow = nrow(input), ncol = ncol(input))
@@ -20,10 +20,10 @@ for (antenna in antennas) {
     a1 <- x + (x - y)
     a2 <- y + (y - x)
 
-    if(a1[1] >= 1 && a1[1] <= nrow(antinodes) && a1[2] >= 1 && a1[2] <= ncol(antinodes)) {
+    if (a1[1] >= 1 && a1[1] <= nrow(antinodes) && a1[2] >= 1 && a1[2] <= ncol(antinodes)) {
       antinodes[a1[1], a1[2]] <- 1
     }
-    if(a2[1] >= 1 && a2[1] <= nrow(antinodes) && a2[2] >= 1 && a2[2] <= ncol(antinodes)) {
+    if (a2[1] >= 1 && a2[1] <= nrow(antinodes) && a2[2] >= 1 && a2[2] <= ncol(antinodes)) {
       antinodes[a2[1], a2[2]] <- 1
     }
   }
@@ -44,7 +44,7 @@ for (antenna in antennas) {
     n <- 0
     while (TRUE) {
       a <- x + n * (x - y)
-      if(a[1] >= 1 && a[1] <= nrow(antinodes) && a[2] >= 1 && a[2] <= ncol(antinodes)) {
+      if (a[1] >= 1 && a[1] <= nrow(antinodes) && a[2] >= 1 && a[2] <= ncol(antinodes)) {
         antinodes[a[1], a[2]] <- 1
       } else {
         break
@@ -55,14 +55,13 @@ for (antenna in antennas) {
     n <- 0
     while (TRUE) {
       a <- y + n * (y - x)
-      if(a[1] >= 1 && a[1] <= nrow(antinodes) && a[2] >= 1 && a[2] <= ncol(antinodes)) {
+      if (a[1] >= 1 && a[1] <= nrow(antinodes) && a[2] >= 1 && a[2] <= ncol(antinodes)) {
         antinodes[a[1], a[2]] <- 1
       } else {
         break
       }
       n <- n + 1
     }
-
   }
 }
 

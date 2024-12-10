@@ -29,7 +29,7 @@ while (length(which(is.na(blocks[1:max(which(!is.na(blocks)))])))) {
   blocks[idx] <- NA
 }
 
-acc <- reduce2(blocks[1:max(which(!is.na(blocks)))], seq_along(blocks[1:max(which(!is.na(blocks)))]), \(acc, x, y) return(acc + x*(y-1)), .init = 0)
+acc <- reduce2(blocks[1:max(which(!is.na(blocks)))], seq_along(blocks[1:max(which(!is.na(blocks)))]), \(acc, x, y) return(acc + x * (y - 1)), .init = 0)
 
 format(acc, scientific = FALSE)
 
@@ -43,7 +43,10 @@ block_map <- tibble(block = blocks, grouping = rep(seq_along(rle(replace_na(bloc
 
 for (b in max(blocks, na.rm = TRUE):min(blocks, na.rm = TRUE)) {
   blck <- block_map |> filter(block == b)
-  new_pos <- block_map |> filter(is.na(block) & idx < blck$idx & len >= blck$len) |> arrange(idx) |> first()
+  new_pos <- block_map |>
+    filter(is.na(block) & idx < blck$idx & len >= blck$len) |>
+    arrange(idx) |>
+    first()
   if (is.na(new_pos$idx)) {
     next
   }
@@ -62,6 +65,12 @@ for (b in max(blocks, na.rm = TRUE):min(blocks, na.rm = TRUE)) {
 }
 # print(blocks)
 
-acc <- reduce2(blocks[1:max(which(!is.na(blocks)))], seq_along(blocks[1:max(which(!is.na(blocks)))]), \(acc, x, y) { if (is.na(x)) { return(acc) } else { return(acc + x*(y-1)) } }, .init = 0)
+acc <- reduce2(blocks[1:max(which(!is.na(blocks)))], seq_along(blocks[1:max(which(!is.na(blocks)))]), \(acc, x, y) {
+  if (is.na(x)) {
+    return(acc)
+  } else {
+    return(acc + x * (y - 1))
+  }
+}, .init = 0)
 
 format(acc, scientific = FALSE)
