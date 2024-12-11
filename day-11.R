@@ -1,5 +1,7 @@
 library(readr)
 library(stringr)
+library(collections)
+library(purrr)
 
 input <- read_lines("11-input.txt") |>
   str_split_fixed(" ", n = Inf) |>
@@ -29,46 +31,34 @@ for (i in 1:25) {
 print(length(input))
 
 # part 2
-score <- local({
-  cache <- list()
+cache <- dict()
 
-  function(value, blinks) {
-    if (length(value) > 1) {
-      acc <- 0
-      for (v in value) {
-        acc <- acc + Recall(v, blinks)
-      }
-      return(acc)
-    }
+score <- function(value, blinks) {
 
-    if (blinks == 0) {
-      return(1)
-    }
-
-    cache_key <- paste(value, blinks, sep = "-")
-    if (!is.null(cache[[cache_key]])) {
-      # print(paste("cache hit", cache_key))
-      return(cache[[cache_key]])
-    }
-
-    if (value == 0) {
-      res <- Recall(1, blinks - 1)
-    } else if (floor(log10(value) + 1) %% 2 == 0) {
-      m <- 10^(floor(log10(value) + 1) / 2)
-      res <- Recall(value %/% m, blinks - 1) + Recall(value %% m, blinks - 1)
-    } else {
-      res <- Recall(value * 2024, blinks - 1)
-    }
-
-    cache[[cache_key]] <<- res
-
-    if (length(cache) %% 5000 == 0) {
-      print(length(cache))
-      print(cache_hits / (cache_hits + cache_misses))
-    }
-
-    return(res)
+  if (length(value) > 1) {
+    return(sum(map_vec(value, \(x) score(x, blinks))))
   }
-})
+
+  if (blinks == 0) {
+    return(1)
+  }
+
+  if (cache$has(c(value, blinks))) {
+    return(cache$get(c(value, blinks)))
+  }
+
+  if (value == 0) {
+    res <- Recall(1, blinks - 1)
+  } else if (floor(log10(value) + 1) %% 2 == 0) {
+    m <- 10^(floor(log10(value) + 1) / 2)
+    res <- Recall(value %/% m, blinks - 1) + Recall(value %% m, blinks - 1)
+  } else {
+    res <- Recall(value * 2024, blinks - 1)
+  }
+
+  cache$set(c(value, blinks), res)
+
+  return(res)
+}
 
 format(score(input2, 75), scientific = FALSE)
