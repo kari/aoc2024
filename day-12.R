@@ -1,5 +1,6 @@
 library(readr)
 library(stringr)
+library(purrr)
 
 input <- read_lines("12-input.txt") |>
   str_split_fixed("", n = Inf)
