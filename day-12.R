@@ -15,7 +15,6 @@ while (length(which(is.na(mapped))) > 0) {
   cursors <- list(idx)
   area <- 0
   perimeter <- 0
-  bounding_box <- c(idx[1], idx[2], idx[1], idx[2]) # top, left, bottom, right. can be inferred from mask.
   mask <- matrix(nrow = nrow(input), ncol = ncol(input))
 
   while (length(cursors) > 0) {
@@ -29,20 +28,6 @@ while (length(which(is.na(mapped))) > 0) {
       perimeter <- perimeter + 4
       area <- area + 1
 
-      if (row < bounding_box[1]) {
-        bounding_box[1] <- row
-      }
-      if (col < bounding_box[2]) {
-        bounding_box[2] <- col
-      }
-      if (row > bounding_box[3]) {
-        bounding_box[3] <- row
-      }
-      if (col > bounding_box[4]) {
-        bounding_box[4] <- col
-      }
-
-      # print(paste(letter, row, col))
       if (row > 1 && input[row - 1, col] == letter) {
         perimeter <- perimeter - 1
         if (is.na(mapped[row - 1, col])) {
@@ -74,7 +59,13 @@ while (length(which(is.na(mapped))) > 0) {
     }
     cursors <- new_cursors
   }
-  regions <- append(regions, list(list(letter = letter, area = area, perimeter = perimeter, bounding_box = bounding_box, mask = mask)))
+
+  regions <- append(regions, list(list(
+    letter = letter,
+    area = area,
+    perimeter = perimeter,
+    mask = mask
+  )))
 }
 
 print(sum(map_vec(regions, \(x) x$area * x$perimeter)))
@@ -83,11 +74,12 @@ print(sum(map_vec(regions, \(x) x$area * x$perimeter)))
 for (i in seq_along(regions)) {
   r <- regions[[i]]
   sides <- 0
-  # print(r$letter)
+  rows <- min(which(regions[[i]]$mask == TRUE, arr.ind = TRUE)[, "row"]):max(which(regions[[i]]$mask == TRUE, arr.ind = TRUE)[, "row"])
+  cols <- min(which(regions[[i]]$mask == TRUE, arr.ind = TRUE)[, "col"]):max(which(regions[[i]]$mask == TRUE, arr.ind = TRUE)[, "col"])
 
   # top sides
-  for (row in r$bounding_box[1]:r$bounding_box[3]) {
-    for (col in r$bounding_box[2]:r$bounding_box[4]) {
+  for (row in rows) {
+    for (col in cols) {
       if (is.na(r$mask[row, col])) { # skip if not in region
         next
       }
@@ -98,17 +90,16 @@ for (i in seq_along(regions)) {
       # it's top row of data frame or
       # it's top row of bounding box or
       # left was empty on top
-      if (col > 1 && input[row, col - 1] == r$letter && (row == 1 || row == r$bounding_box[1] || input[row - 1, col - 1] != r$letter)) {
+      if (col > 1 && input[row, col - 1] == r$letter && (row == 1 || row == min(rows) || input[row - 1, col - 1] != r$letter)) {
         next
       }
-      # print(paste("top side starts at", row, col))
       sides <- sides + 1
     }
   }
 
   # left sides
-  for (col in r$bounding_box[2]:r$bounding_box[4]) {
-    for (row in r$bounding_box[3]:r$bounding_box[1]) { # note down-to-up
+  for (col in cols) {
+    for (row in rev(rows)) { # note down-to-up
       if (is.na(r$mask[row, col])) { # skip if not in region
         next
       }
@@ -119,18 +110,16 @@ for (i in seq_along(regions)) {
       # it's first col of data frame or
       # it's first col of bounding box or
       # bottom was empty on left
-      if (row < nrow(input) && input[row + 1, col] == r$letter && (col == 1 || col == r$bounding_box[2] || input[row + 1, col - 1] != r$letter)) {
-        # print(paste(row, col, col == 1, row == r$bounding_box[2], input[row + 1, col - 1] != r$letter))
+      if (row < nrow(input) && input[row + 1, col] == r$letter && (col == 1 || col == min(cols) || input[row + 1, col - 1] != r$letter)) {
         next
       }
-      # print(paste("left side starts at", row, col))
       sides <- sides + 1
     }
   }
 
   # right sides
-  for (col in r$bounding_box[4]:r$bounding_box[2]) { # right to left
-    for (row in r$bounding_box[1]:r$bounding_box[3]) {
+  for (col in rev(cols)) { # right to left
+    for (row in rows) {
       if (is.na(r$mask[row, col])) { # skip if not in region
         next
       }
@@ -141,17 +130,16 @@ for (i in seq_along(regions)) {
       # it's last col of data frame or
       # it's last col of bounding box or
       # up was empty on right
-      if (row > 1 && input[row - 1, col] == r$letter && (col == ncol(input) || col == r$bounding_box[4] || input[row - 1, col + 1] != r$letter)) {
+      if (row > 1 && input[row - 1, col] == r$letter && (col == ncol(input) || col == max(cols) || input[row - 1, col + 1] != r$letter)) {
         next
       }
-      # print(paste("right side starts at", row, col))
       sides <- sides + 1
     }
   }
 
   # bottom sides
-  for (row in r$bounding_box[3]:r$bounding_box[1]) {
-    for (col in r$bounding_box[2]:r$bounding_box[4]) {
+  for (row in rev(rows)) {
+    for (col in cols) {
       if (is.na(r$mask[row, col])) { # skip if not in region
         next
       }
@@ -162,14 +150,12 @@ for (i in seq_along(regions)) {
       # it's last row of data frame or
       # it's last row of bounding box or
       # left was empty on bottom
-      if (col > 1 && input[row, col - 1] == r$letter && (row == nrow(input) || row == r$bounding_box[3] || input[row + 1, col - 1] != r$letter)) {
+      if (col > 1 && input[row, col - 1] == r$letter && (row == nrow(input) || row == max(rows) || input[row + 1, col - 1] != r$letter)) {
         next
       }
-      # print(paste("bottom side starts at", row, col))
       sides <- sides + 1
     }
   }
-  # print(paste(r$letter, r$area, sides, r$area * sides))
   regions[[i]]$sides <- sides
 }
 
