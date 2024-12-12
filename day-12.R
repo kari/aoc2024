@@ -88,9 +88,8 @@ for (i in seq_along(regions)) {
       }
       # if there's a same letter on left, can't start a side if
       # it's top row of data frame or
-      # it's top row of bounding box or
       # left was empty on top
-      if (col > 1 && input[row, col - 1] == r$letter && (row == 1 || row == min(rows) || input[row - 1, col - 1] != r$letter)) {
+      if (col > 1 && input[row, col - 1] == r$letter && (row == 1 || input[row - 1, col - 1] != r$letter)) {
         next
       }
       sides <- sides + 1
@@ -108,9 +107,8 @@ for (i in seq_along(regions)) {
       }
       # if there's a same letter on below, can't start a side if
       # it's first col of data frame or
-      # it's first col of bounding box or
       # bottom was empty on left
-      if (row < nrow(input) && input[row + 1, col] == r$letter && (col == 1 || col == min(cols) || input[row + 1, col - 1] != r$letter)) {
+      if (row < nrow(input) && input[row + 1, col] == r$letter && (col == 1 || input[row + 1, col - 1] != r$letter)) {
         next
       }
       sides <- sides + 1
@@ -128,9 +126,8 @@ for (i in seq_along(regions)) {
       }
       # if there's a same letter up, can't start a side if
       # it's last col of data frame or
-      # it's last col of bounding box or
       # up was empty on right
-      if (row > 1 && input[row - 1, col] == r$letter && (col == ncol(input) || col == max(cols) || input[row - 1, col + 1] != r$letter)) {
+      if (row > 1 && input[row - 1, col] == r$letter && (col == ncol(input) || input[row - 1, col + 1] != r$letter)) {
         next
       }
       sides <- sides + 1
@@ -148,9 +145,8 @@ for (i in seq_along(regions)) {
       }
       # if there's a same letter on left, can't start a side if
       # it's last row of data frame or
-      # it's last row of bounding box or
       # left was empty on bottom
-      if (col > 1 && input[row, col - 1] == r$letter && (row == nrow(input) || row == max(rows) || input[row + 1, col - 1] != r$letter)) {
+      if (col > 1 && input[row, col - 1] == r$letter && (row == nrow(input) || input[row + 1, col - 1] != r$letter)) {
         next
       }
       sides <- sides + 1
